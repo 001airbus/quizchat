@@ -1,7 +1,17 @@
+
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "target": "ES5",
+    "lib": ["DOM", "ES2015","ES2016"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@pages/*": ["src/*"]
+    },
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "types": ["vite-plugin-svgr/client"]
+  },
+  "include": ["src", "svg.d.ts"]
 }
