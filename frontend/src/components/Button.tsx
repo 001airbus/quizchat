@@ -4,6 +4,7 @@ type ButtonProps = {
     text: string;
     variant?: 'primary' | 'section' | 'hover' | 'active' | 'warning';
     onClick?: () => void;
+    disabled?: boolean;
 }
 type VariantStyle = {
     background: string;
@@ -39,7 +40,6 @@ const variantStyles: Record<string, VariantStyle> = {
 }
 
 
-
 function Button({text, variant = 'primary', onClick}:  ButtonProps) {
     return (
         <ButtonStyle $variant={variant} onClick={onClick}>{text}</ButtonStyle>
@@ -47,7 +47,8 @@ function Button({text, variant = 'primary', onClick}:  ButtonProps) {
 }
 
 const ButtonStyle = styled.button<{$variant: keyof typeof variantStyles}>`
-    width: 241px;
+    max-width: 100%;
+    width: 100%;
     height: 40px;
 
     background-color: ${({$variant}) => variantStyles[$variant].background};
@@ -63,5 +64,4 @@ const ButtonStyle = styled.button<{$variant: keyof typeof variantStyles}>`
     &:hover {background-color: ${({ $variant }) => variantStyles[$variant].hoverBackground};}
     &:active {background-color: ${({ $variant }) => variantStyles[$variant].activeBackground};}
 `
-
 export default Button;

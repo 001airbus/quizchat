@@ -7,6 +7,8 @@ type InputProps = {
 
     width?: string; // 고정값 or 유니언 타입으로? primary | vote 
     height?: string;
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    readOnly?: boolean;
 }
 
 type variantStyle = {
@@ -25,12 +27,13 @@ const variantStyles: Record<string, variantStyle> = {
 
 
 
-function Input({value, variant = 'primary', placeholder = '입력해주세요'}: InputProps) {
+function Input({value, variant = 'primary', placeholder = '입력해주세요', onChange}: InputProps) {
     return (
         <InputStyle 
             value={value}
             placeholder={placeholder}
             $variant={variant}
+            onChange={onChange}
         />
     )
 }
@@ -47,6 +50,12 @@ const InputStyle = styled.input<{$variant: keyof typeof variantStyles}>`
     border: ${({$variant}) => variantStyles[$variant].border};
     border-radius: 8px;
     cursor: pointer;
+
+    &:focus{
+    outline: none;
+    /*border:3px solid  #5A8BD9;*/
+    box-shadow: 0 0 0 3px #5A8BD9;
+    }
 
 `;
 

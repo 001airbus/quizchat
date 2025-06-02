@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import styled from "styled-components";
-import Button from "./Button";
+//import Button from "./Button";
 
 type ModalProps = {
     isOpen: boolean;
@@ -28,6 +28,7 @@ const ModalStyle = styled.div`
     border-radius: 8px;
 
     min-width: 260px;
+    /*height: 492px;*/
     position: relative;
 `;
 
@@ -38,7 +39,7 @@ function Modal({isOpen, onClose, children}: ModalProps) {
     return (
         <Overlay onClick={onClose}>
             <ModalStyle onClick={e => e.stopPropagation()}>
-                <Button text="버튼(닫기)" variant="primary" onClick={onClose} />
+                {/* <Button text="버튼(닫기)" variant="primary" onClick={onClose} /> */}
                 {/* <CloseButton onClick={onClose}>&times;</CloseButton> */}
                 {children}
             </ModalStyle>
