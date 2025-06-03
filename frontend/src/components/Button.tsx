@@ -1,67 +1,37 @@
+import type React from "react";
 import styled from "styled-components";
 
-type ButtonProps = {
-    text: string;
-    variant?: 'primary' | 'section' | 'hover' | 'active' | 'warning';
-    onClick?: () => void;
-    disabled?: boolean;
-}
-type VariantStyle = {
-    background: string;
-    color: string;
-    hoverBackground?: string;
-    activeBackground?: string;
+interface Props{
+    onClick: () => void;
+    children: React.ReactNode;
 }
 
-
-const variantStyles: Record<string, VariantStyle> = {
-    primary: {
-        background: '#BFD5FF',
-        color: '#1F1F1F',
-        hoverBackground: '#D5E4FF',
-        activeBackground: '#8BB2F2',
-    },
-    section: {
-        background: '#EAF1FF',
-        color: '#1F1F1F',
-    },
-    hover: {
-        background: '#D5E4FF',
-        color: '#1F1F1F',
-    },
-    active: {
-        background: '#8BB2F2',
-        color: '#1F1F1F',
-    },
-    warning: {
-        background: '#FFBEBE',
-        color: '#1F1F1F',
-    }
-}
-
-
-function Button({text, variant = 'primary', onClick}:  ButtonProps) {
-    return (
-        <ButtonStyle $variant={variant} onClick={onClick}>{text}</ButtonStyle>
+function Button({onClick, children}: Props){
+    return(
+        <ButtonStyle onClick={onClick}>
+            {children}
+        </ButtonStyle>
     )
 }
 
-const ButtonStyle = styled.button<{$variant: keyof typeof variantStyles}>`
-    max-width: 100%;
-    width: 100%;
-    height: 40px;
-
-    background-color: ${({$variant}) => variantStyles[$variant].background};
-    color: ${({$variant}) => variantStyles[$variant].color};
+const ButtonStyle = styled.button`
     display: flex;
-    align-items: center;
+    width: 241px;
+    height: 40px;
+    padding: 10px 14px;
     justify-content: center;
-
-    border: none;
+    align-items: center;
+    align-content: center;
+    gap: 8px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    border: 0;
     border-radius: 8px;
-    cursor: pointer;
+    background: #D5E4FF;
 
-    &:hover {background-color: ${({ $variant }) => variantStyles[$variant].hoverBackground};}
-    &:active {background-color: ${({ $variant }) => variantStyles[$variant].activeBackground};}
-`
+    &:hover{
+        background: #8BB2F2;
+    }
+`;
+
 export default Button;

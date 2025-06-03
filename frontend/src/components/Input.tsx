@@ -23,23 +23,28 @@ const variantStyles: Record<string, variantStyle> = {
         border: '1px solid #5A8BD9',
         color: '#1F1F1F',
     },
+    chat: {
+        background: '#EAF1FF',
+        border: '0',
+        color: '#5F6B7A',
+    }
 }
 
 
 
-function Input({value, variant = 'primary', placeholder = '입력해주세요', onChange}: InputProps) {
+function Input({value, variant = 'primary', placeholder, width}: InputProps) {
     return (
         <InputStyle 
             value={value}
             placeholder={placeholder}
             $variant={variant}
-            onChange={onChange}
+            width={width}
         />
     )
 }
 
-const InputStyle = styled.input<{$variant: keyof typeof variantStyles}>`
-    width: 241px;
+const InputStyle = styled.input<{$variant: keyof typeof variantStyles, width?: string}>`
+    width: ${({ width }) => width || '241px'}; /* 전달받은 width prop 사용, 없으면 기본값 241px */
     height: 40px;
     padding: 4px 8px 4px 8px;
     box-sizing: border-box; 
