@@ -7,32 +7,70 @@ import Send from "../../assets/send.svg?react";
 import Menu_Vote from "../../assets/menu_vote.svg?react";
 import Menu_Quiz from "../../assets/menu_quiz.svg?react";
 
-function MessageInput(){
+type MessageInputProps = {
+    onInitiateCreateVote: () => void;
+    chatAutoInput: string;
+    setChatAutoInput: React.Dispatch<React.SetStateAction<string>>;
+    currentNickname: string;
+    onRequestNicknameChange: () => void;
+    onSendMessage: (messageText: string) => void;
+};
+
+function MessageInput({ onInitiateCreateVote, chatAutoInput, setChatAutoInput, currentNickname, onRequestNicknameChange, onSendMessage }: MessageInputProps){
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [currentMessage, setCurrentMessage] = useState(chatAutoInput);
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
     };
 
+    const handleVoteClick = () => {
+        onInitiateCreateVote();
+        setIsMenuOpen(false);
+    };
+
+    const handleQuizClick = () => {
+        setChatAutoInput("/quiz 문제: 정답: 제한시간: ");
+        setCurrentMessage("/quiz 문제: 정답: 제한시간: ");
+        setIsMenuOpen(false);
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setCurrentMessage(e.target.value);
+        setChatAutoInput(e.target.value);
+    };
+
+    const handleSendClick = () => {
+        onSendMessage(currentMessage);
+        setCurrentMessage("");
+        setChatAutoInput("");
+    };
+
     return (
         <MessageInputStyle>
             <NameRow>
-                <p>닉네임 표기 부분</p>
-                <StyledNameChangeIcon />
+                <p>{currentNickname || '닉네임 설정 필요'}</p> {/* 닉네임 표시, 없으면 기본 텍스트 */}
+                <StyledNameChangeIcon onClick={onRequestNicknameChange} />
             </NameRow>
             <InputRow>
                 <StyledMenuIcon onClick={toggleMenu} $isMenuOpen={isMenuOpen} />
-                <Input placeholder="채팅을 시작해보세요!" variant="chat" width="100%"/>
-                <StyledSendIcon onClick={() => console.log("Send clicked")} />
+                <Input
+                    placeholder="채팅을 시작해보세요!"
+                    variant="chat"
+                    width="100%"
+                    value={currentMessage}
+                    onChange={handleInputChange}
+                />
+                <StyledSendIcon onClick={handleSendClick} />
             </InputRow>
             <ActionMenuContainer $isOpen={isMenuOpen}>
-                <MenuItem onClick={() => console.log("설정 클릭")}>
+                <MenuItem onClick={handleVoteClick}>
                     <Menu_Vote />
-                    투표
+                    <span>투표</span>
                 </MenuItem>
-                <MenuItem onClick={() => console.log("도움말 클릭")}>
+                <MenuItem onClick={handleQuizClick}>
                     <Menu_Quiz />
-                    퀴즈
+                    <span>퀴즈</span>
                 </MenuItem>
             </ActionMenuContainer>
         </MessageInputStyle>
@@ -56,7 +94,6 @@ const MessageInputStyle = styled.div`
         margin: 0 0 4px 0;
         font-size: 14px;
         color: #5F6B7A;
-        /* 필요에 따라 추가 스타일링 */
     }
 `;
 
@@ -90,13 +127,11 @@ const StyledMenuIcon = styled(Menu)<{ $isMenuOpen: boolean }>`
 `;
 
 const ActionMenuContainer = styled.div<{ $isOpen: boolean }>`
-    width: 100%; /* 부모 컴포넌트의 너비를 따름 */
-    overflow: hidden; /* 내부 콘텐츠가 넘칠 경우 숨김 (애니메이션에 중요) */
+    width: 100%;
+    overflow: hidden;
     
-    /* 애니메이션을 위한 트랜지션 */
     transition: max-height 0.35s ease-in-out, opacity 0.3s ease-in-out, padding 0.35s ease-in-out;
     
-    /* 초기 상태 (닫혀 있을 때) */
     max-height: 0;
     opacity: 0;
     padding-top: 0;
@@ -105,10 +140,10 @@ const ActionMenuContainer = styled.div<{ $isOpen: boolean }>`
     ${({ $isOpen }) =>
         $isOpen &&
         `
-        max-height: 200px; /* 메뉴 내용에 따라 충분한 높이로 조절 */
+        max-height: 200px;
         opacity: 1;
-        padding-top: 10px; /* 메뉴가 열렸을 때 상단 패딩 */
-        padding-bottom: 10px; /* 메뉴가 열렸을 때 하단 패딩 */
+        padding-top: 10px;
+        padding-bottom: 10px;
     `}
     
     display: flex;
@@ -119,8 +154,18 @@ const ActionMenuContainer = styled.div<{ $isOpen: boolean }>`
 
 const MenuItem = styled.div`
     display: flex;
+    gap: 5px;
     flex-direction: column;
     align-items: center;
+
+    span{
+        color: #5A8BD9;
+        font-size: 12px;
+    }
+
+    svg{
+        fill: #5A8BD9;
+    }
 `;
 
 const StyledSendIcon = styled(Send)`

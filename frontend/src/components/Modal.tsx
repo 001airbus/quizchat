@@ -55,6 +55,9 @@ const ModalContent = styled.div`
     max-height: 90vh;
     overflow-y: auto;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 `;
 
 const ModalHeader = styled.div`

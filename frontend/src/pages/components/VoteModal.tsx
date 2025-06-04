@@ -34,23 +34,13 @@ const CheckboxLabel = styled.label`
 
 const ButtonGroup = styled.div<{ marginTop?: number }>`
   width: 241px;
-  /* width: 241px; */
   box-sizing: border-box;
   display: flex;
-  /* justify-content: space-between; */
   gap: 8px;
   margin-top: ${({ marginTop }) => marginTop}px;
+  flex-direction: column;
 `;
 
-// const CloseIcon = styled.button`
-//   position: absolute;
-//   top: 16px;
-//   right: 16px;
-//   border: none;
-//   background: transparent;
-//   font-size: 18px;
-//   cursor: pointer;
-// `;
 
 const HalfButton = styled(Button)`
   flex: 1 1 0;
@@ -65,13 +55,11 @@ function VoteModal({ mode, isOpen, onClose }: VoteModalProps) {
 
   // owner
   const [isEditing, setIsEditing] = useState(false);
-  //const [ownerVoteTitle, setOwnerVoteTitle] = useState("진행중인 투표 제목");
-  //const [ownerOptions, setOwnerOptions] = useState(["", ""]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <Container>
-        {mode === "create" && ( //투표 작성하기 (투표 생성)
+        {mode === "create" && (
           <>
             <Title>투표 작성하기</Title>
 
@@ -115,7 +103,7 @@ function VoteModal({ mode, isOpen, onClose }: VoteModalProps) {
           </>
         )}
 
-        {mode === "owner" && ( //투표만든사람 - 종료, 수정 가능
+        {mode === "owner" && (
           <>
             <Title>투표정보</Title>
 
@@ -170,7 +158,7 @@ function VoteModal({ mode, isOpen, onClose }: VoteModalProps) {
           </>
         )}
 
-        {mode === "participant" && ( //투표 작성하기 (복수)선택
+        {mode === "participant" && (
           <>
             <Title>투표하기</Title>
             <Input value={voteTitle} readOnly placeholder="투표 제목" />
@@ -189,7 +177,6 @@ function VoteModal({ mode, isOpen, onClose }: VoteModalProps) {
                 }}
               />
             ))}
-            {/* create에서 체크박스 홠성화 되어있을때만 텍스트 노출되게 변경해야함 */}
             <p>복수선택 가능</p> 
             <ButtonGroup marginTop={40}>
               <HalfButton text="완료" variant="primary" onClick={() => {}} />

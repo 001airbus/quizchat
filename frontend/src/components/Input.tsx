@@ -32,19 +32,21 @@ const variantStyles: Record<string, variantStyle> = {
 
 
 
-function Input({value, variant = 'primary', placeholder, width}: InputProps) {
+function Input({value, variant = 'primary', placeholder, width, onChange, readOnly}: InputProps) {
     return (
         <InputStyle 
             value={value}
             placeholder={placeholder}
             $variant={variant}
             width={width}
+            onChange={onChange} // 전달받은 onChange 핸들러를 InputStyle에 연결
+            readOnly={readOnly}   // readOnly prop도 일관성을 위해 전달
         />
     )
 }
 
 const InputStyle = styled.input<{$variant: keyof typeof variantStyles, width?: string}>`
-    width: ${({ width }) => width || '241px'}; /* 전달받은 width prop 사용, 없으면 기본값 241px */
+    width: ${({ width }) => width || '241px'};
     height: 40px;
     padding: 4px 8px 4px 8px;
     box-sizing: border-box; 
@@ -58,7 +60,6 @@ const InputStyle = styled.input<{$variant: keyof typeof variantStyles, width?: s
 
     &:focus{
     outline: none;
-    /*border:3px solid  #5A8BD9;*/
     box-shadow: 0 0 0 3px #5A8BD9;
     }
 
