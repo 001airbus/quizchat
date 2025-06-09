@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { io, Socket } from 'socket.io-client';
 import Header from '../components/Header';
 import Modal from '../components/Modal';
 import * as S from './ChatRoom.style';
@@ -7,9 +6,10 @@ import MessageInput from './components/MessageInput';
 import MessageList from './components/MessageList';
 import Button from '../components/Button';
 import Input from '../components/Input';
+import { io, Socket } from 'socket.io-client';
 
 export interface ChatMessage {
-  id: string;
+  id?: string; // socket.io 서버에서는 id 자동 생성되지 않을 수 있음
   nickname: string;
   text: string;
   timestamp: string;
@@ -25,58 +25,71 @@ function ChatRoom({ onInitiateCreateVote, chatAutoInput, setChatAutoInput }: Cha
   const [isNicknameModalOpen, setIsNicknameModalOpen] = useState(true);
   const [nickname, setNickname] = useState('');
   const [nicknameError, setNicknameError] = useState('');
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 'dummy-1',
-      nickname: '나의닉네임',
-      text: '이것은 내가 보낸 더미 메시지입니다.',
-      timestamp: new Date().toISOString(),
-    },
-    {
-      id: 'dummy-2',
-      nickname: '다른사용자',
-      text: '이것은 다른 사용자가 보낸 더미 메시지입니다.',
-      timestamp: new Date().toISOString(),
-    },
-  ]);
-
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    if (nickname && !socketRef.current) {
-      const socket = io('http://ec2-3-35-99-106.ap-northeast-2.compute.amazonaws.com:3000', {
-        transports: ['websocket'], // 필요에 따라 추가
-      });
+    const socket = io(import.meta.env.VITE_SOCKET_URL, {
+      transports: ['websocket'],
+    });
 
-      socketRef.current = socket;
+    socketRef.current = socket;
+    
+    // 소켓 연결 확인
+    socket.on('connect', () => {
+        console.log('WebSocket 연결 성공:', socket.id);
+    });
 
-      socket.on('connect', () => {
-        console.log('Socket.IO Connected');
-        socket.emit('join', { nickname });
-      });
+    socket.on('connect_error', (err) => {
+        console.error('WebSocket 연결 실패:', err.message);
+    });
 
-      socket.on('message', (payload: ChatMessage) => {
-        setMessages(prev => [...prev, payload]);
-      });
 
-      socket.on('history', (payload: ChatMessage[]) => {
-        setMessages(payload);
-      });
+    
 
-      socket.on('disconnect', () => {
-        console.log('Socket.IO Disconnected');
-      });
-
-      socket.on('connect_error', (err) => {
-        console.error('Connection Error:', err);
-      });
+    // 닉네임 등록 후 연결
+    if (nickname) {
+      socket.emit('set_nickname', nickname);
     }
 
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current = null;
+    // 일반 채팅 메시지 수신
+    socket.on('chat_message', (data: { nickname: string; message: string; time: string }) => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          nickname: data.nickname,
+          text: data.message,
+          timestamp: data.time,
+        },
+      ]);
+    });
+
+    // 시스템 메시지 수신 (입장/퇴장 등)
+    socket.on('system_message', (msg: string) => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          nickname: 'SYSTEM',
+          text: msg,
+          timestamp: new Date().toLocaleTimeString('ko-KR', {
+            hour: '2-digit',
+            minute: '2-digit',
+          }),
+        },
+      ]);
+    });
+
+    // 닉네임 중복 에러
+    socket.on('nickname_error', (payload) => {
+      if (payload.source === 'join') {
+        setNicknameError(payload.msg);
+        setIsNicknameModalOpen(true);
+        socket.disconnect();
       }
+    });
+
+    return () => {
+      socket.disconnect();
     };
   }, [nickname]);
 
@@ -91,10 +104,6 @@ function ChatRoom({ onInitiateCreateVote, chatAutoInput, setChatAutoInput }: Cha
     }
     setNicknameError('');
     setIsNicknameModalOpen(false);
-
-    setMessages(prevMessages =>
-      prevMessages.map(msg => (msg.id === 'dummy-1' ? { ...msg, nickname } : msg))
-    );
   };
 
   const handleRequestNicknameChange = () => {
@@ -103,14 +112,9 @@ function ChatRoom({ onInitiateCreateVote, chatAutoInput, setChatAutoInput }: Cha
 
   const handleSendMessage = (text: string) => {
     if (socketRef.current && text.trim()) {
-      const messageToSend = {
-        type: 'message',
-        nickname,
-        text,
-      };
-      socketRef.current.emit('message', messageToSend);
+      socketRef.current.emit('chat_message', text);
     } else {
-      console.error('Socket.IO is not connected or message is empty.');
+      console.error('소켓이 연결되지 않았거나 메시지가 비어 있습니다.');
     }
   };
 

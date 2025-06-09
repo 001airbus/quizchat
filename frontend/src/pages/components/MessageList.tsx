@@ -36,7 +36,7 @@ const MessageListStyle = styled.div`
     flex-grow: 1;
     overflow-y: auto;
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
     width: 100%;
     gap: 10px;
 `;
