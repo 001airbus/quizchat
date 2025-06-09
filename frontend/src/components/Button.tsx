@@ -16,9 +16,9 @@ type VariantStyle = {
 
 const variantStyles: Record<string, VariantStyle> = {
     primary: {
-        background: '#BFD5FF',
+        background: '#D5E4FF',
         color: '#1F1F1F',
-        hoverBackground: '#D5E4FF',
+        hoverBackground: '#BFD5FF',
         activeBackground: '#8BB2F2',
     },
     section: {
@@ -64,4 +64,24 @@ const ButtonStyle = styled.button<{$variant: keyof typeof variantStyles}>`
     &:hover {background-color: ${({ $variant }) => variantStyles[$variant].hoverBackground};}
     &:active {background-color: ${({ $variant }) => variantStyles[$variant].activeBackground};}
 `
+// const ButtonStyle = styled.button`
+//     display: flex;
+//     width: 241px;
+//     height: 40px;
+//     padding: 10px 14px;
+//     justify-content: center;
+//     align-items: center;
+//     align-content: center;
+//     gap: 8px;
+//     flex-shrink: 0;
+//     flex-wrap: wrap;
+//     border: 0;
+//     border-radius: 8px;
+//     background: #D5E4FF;
+
+//     &:hover{
+//         background: #8BB2F2;
+//     }
+// `;
+
 export default Button;

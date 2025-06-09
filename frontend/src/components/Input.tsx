@@ -23,23 +23,30 @@ const variantStyles: Record<string, variantStyle> = {
         border: '1px solid #5A8BD9',
         color: '#1F1F1F',
     },
+    chat: {
+        background: '#EAF1FF',
+        border: '0',
+        color: '#5F6B7A',
+    }
 }
 
 
 
-function Input({value, variant = 'primary', placeholder = '입력해주세요', onChange}: InputProps) {
+function Input({value, variant = 'primary', placeholder, width, onChange, readOnly}: InputProps) {
     return (
         <InputStyle 
             value={value}
             placeholder={placeholder}
             $variant={variant}
-            onChange={onChange}
+            width={width}
+            onChange={onChange} // 전달받은 onChange 핸들러를 InputStyle에 연결
+            readOnly={readOnly}   // readOnly prop도 일관성을 위해 전달
         />
     )
 }
 
-const InputStyle = styled.input<{$variant: keyof typeof variantStyles}>`
-    width: 241px;
+const InputStyle = styled.input<{$variant: keyof typeof variantStyles, width?: string}>`
+    width: ${({ width }) => width || '241px'};
     height: 40px;
     padding: 4px 8px 4px 8px;
     box-sizing: border-box; 
@@ -53,7 +60,6 @@ const InputStyle = styled.input<{$variant: keyof typeof variantStyles}>`
 
     &:focus{
     outline: none;
-    /*border:3px solid  #5A8BD9;*/
     box-shadow: 0 0 0 3px #5A8BD9;
     }
 

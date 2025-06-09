@@ -1,52 +1,90 @@
-import type { ReactNode } from "react";
+import type React from "react";
 import styled from "styled-components";
-//import Button from "./Button";
 
-type ModalProps = {
+interface Props{
     isOpen: boolean;
     onClose: () => void;
-    children: ReactNode;
+    children: React.ReactNode;
+    title?: string;
 }
 
-const Overlay = styled.div`
-    background-color: rgba(0, 0, 0, 0.5);
+function Modal({isOpen, onClose, title, children}: Props){
+
+    if(!isOpen){
+        return null;
+    }
+
+    return(
+        <ModalOverlay>
+            <ModalContent>
+                {title && (
+                    <ModalHeader>
+                        <h2>{title}</h2>
+                    </ModalHeader>
+                )}
+                <ModalBody>
+                    {children}
+                </ModalBody>
+
+            </ModalContent>
+
+        </ModalOverlay>
+    )
+}
+
+const ModalOverlay = styled.div`
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 999;
+    background: rgba(0, 0, 0, 0.50);
+    z-index: 1000;
 `;
 
-const ModalStyle = styled.div`
-    background: #FFFFFF;
-    padding: 20px;
+const ModalContent = styled.div`
+    background: white;
+    padding: 37px 10px;
     border-radius: 8px;
-
-    min-width: 260px;
-    /*height: 492px;*/
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    min-width: 300px;
+    max-width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 `;
 
+const ModalHeader = styled.div`
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+    justify-content: center;
 
-function Modal({isOpen, onClose, children}: ModalProps) {
+    h2 {
+        color: #1F1F1F;
+        text-align: center;
+        font-family: Roboto;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 100%;
+        letter-spacing: -0.28px;
+    }
+`;
 
-    if (!isOpen) return null;
-    return (
-        <Overlay onClick={onClose}>
-            <ModalStyle onClick={e => e.stopPropagation()}>
-                {/* <Button text="버튼(닫기)" variant="primary" onClick={onClose} /> */}
-                {/* <CloseButton onClick={onClose}>&times;</CloseButton> */}
-                {children}
-            </ModalStyle>
-        </Overlay>
-
-    )
-}
+const ModalBody = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    align-items: center;
+    justify-content: center;
+`;
 
 
 export default Modal;
