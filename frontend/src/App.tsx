@@ -1,7 +1,7 @@
 import { useState } from "react";
 import ChatRoom from "./pages/ChatRoom";
-import VoteModal from "./pages/components/VoteModal";
 import { GlobalStyle } from "./styles/global.style";
+import VoteModal from "./pages/components/VoteModal";
 
 function App() {
 
