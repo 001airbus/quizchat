@@ -8,6 +8,7 @@ type InputProps = {
     width?: string; // 고정값 or 유니언 타입으로? primary | vote 
     height?: string;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
     readOnly?: boolean;
 }
 
@@ -32,7 +33,7 @@ const variantStyles: Record<string, variantStyle> = {
 
 
 
-function Input({value, variant = 'primary', placeholder, width, onChange, readOnly}: InputProps) {
+function Input({value, variant = 'primary', placeholder, width, onChange, onKeyDown, readOnly}: InputProps) {
     return (
         <InputStyle 
             value={value}
@@ -40,6 +41,7 @@ function Input({value, variant = 'primary', placeholder, width, onChange, readOn
             $variant={variant}
             width={width}
             onChange={onChange} // 전달받은 onChange 핸들러를 InputStyle에 연결
+            onKeyDown={onKeyDown}
             readOnly={readOnly}   // readOnly prop도 일관성을 위해 전달
         />
     )

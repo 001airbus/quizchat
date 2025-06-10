@@ -46,6 +46,13 @@ function MessageInput({ onInitiateCreateVote, chatAutoInput, setChatAutoInput, c
         setChatAutoInput("");
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleSendClick();
+        }
+    };
+
     return (
         <MessageInputStyle>
             <NameRow>
@@ -60,6 +67,7 @@ function MessageInput({ onInitiateCreateVote, chatAutoInput, setChatAutoInput, c
                     width="100%"
                     value={currentMessage}
                     onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
                 />
                 <StyledSendIcon onClick={handleSendClick} />
             </InputRow>

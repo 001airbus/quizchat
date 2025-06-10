@@ -47,10 +47,10 @@ function ChatRoom({ onInitiateCreateVote, chatAutoInput, setChatAutoInput }: Cha
 
     
 
-    // 닉네임 등록 후 연결
-    if (nickname) {
-      socket.emit('set_nickname', nickname);
-    }
+    // // 닉네임 등록 후 연결
+    // if (nickname) {
+    //   socket.emit('set_nickname', nickname);
+    // }
 
     // 일반 채팅 메시지 수신
     socket.on('chat_message', (data: { nickname: string; message: string; time: string }) => {
@@ -91,7 +91,7 @@ function ChatRoom({ onInitiateCreateVote, chatAutoInput, setChatAutoInput }: Cha
     return () => {
       socket.disconnect();
     };
-  }, [nickname]);
+  }, []);
 
   const handleNicknameSubmit = () => {
     if (!nickname.trim()) {
@@ -104,7 +104,14 @@ function ChatRoom({ onInitiateCreateVote, chatAutoInput, setChatAutoInput }: Cha
     }
     setNicknameError('');
     setIsNicknameModalOpen(false);
-  };
+  
+
+  if (socketRef.current?.connected) {
+    socketRef.current.emit('set_nickname', nickname.trim());
+  } else {
+    console.error('소켓 연결이 되지 않았습니다.')
+  }
+};
 
   const handleRequestNicknameChange = () => {
     setIsNicknameModalOpen(true);
