@@ -30,8 +30,8 @@ function MessageInput({ onInitiateCreateVote, chatAutoInput, setChatAutoInput, c
     };
 
     const handleQuizClick = () => {
-        setChatAutoInput("/quiz 문제: 정답: 제한시간: ");
-        setCurrentMessage("/quiz 문제: 정답: 제한시간: ");
+        setChatAutoInput("/quiz 질문: 정답: 제한시간: ");
+        setCurrentMessage("/quiz 질문: 정답: 제한시간: ");
         setIsMenuOpen(false);
     };
 
@@ -44,6 +44,13 @@ function MessageInput({ onInitiateCreateVote, chatAutoInput, setChatAutoInput, c
         onSendMessage(currentMessage);
         setCurrentMessage("");
         setChatAutoInput("");
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleSendClick();
+        }
     };
 
     return (
@@ -60,6 +67,7 @@ function MessageInput({ onInitiateCreateVote, chatAutoInput, setChatAutoInput, c
                     width="100%"
                     value={currentMessage}
                     onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
                 />
                 <StyledSendIcon onClick={handleSendClick} />
             </InputRow>

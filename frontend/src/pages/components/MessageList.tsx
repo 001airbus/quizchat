@@ -24,12 +24,9 @@ function MessageList({ messages, currentNickname }: MessageListProps){
                     <Bubble $isMine={msg.nickname === currentNickname}>
                         <Text>{msg.text}</Text>
                     </Bubble>
-                    <Timestamp $isMine={msg.nickname === currentNickname}>
-                        {new Date(msg.timestamp).toLocaleTimeString('ko-KR', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                        })}
-                    </Timestamp>
+                    {/* <Timestamp $isMine={msg.nickname === currentNickname}>{new Date(msg.timestamp).toLocaleTimeString()}</Timestamp> */}
+                    <Timestamp $isMine={msg.nickname === currentNickname}>{msg.timestamp}</Timestamp>
+                    {/* <Timestamp $isMine={msg.nickname === currentNickname}>{dayjs.utc(msg.timestamp).tz('Asia/Seoul').format('HH:mm')}</Timestamp> */}
                 </MessageItem>
             ))}
             <div ref={messagesEndRef} />
