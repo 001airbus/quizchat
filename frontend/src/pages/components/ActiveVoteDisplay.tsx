@@ -4,6 +4,21 @@ import type { VoteData } from "./VoteModal";
 interface ActiveVoteDisplayProps {
     voteData: VoteData;
 }
+function ActiveVoteDisplay({ voteData }: ActiveVoteDisplayProps) {
+    const totalVotes = voteData.options.reduce((sum, option) => sum + (option.count || 0), 0);
+    return (
+        <ActiveVoteContainer>
+            <VoteTitle>🗳️ "{voteData.title}" 투표가 진행중입니다!</VoteTitle>
+            <VoteInfo>
+                {voteData.allowMultipleSelections ? "복수 선택 가능" : "단일 선택"}
+                {voteData.isAnonymous && ", 익명 투표"}
+
+                {totalVotes > 0 && `, 현재 ${totalVotes}명 참여`}
+            </VoteInfo>
+            {/* 필요에 따라 더 많은 정보 (예: 참여 버튼)를 추가할 수 있습니다. */}
+        </ActiveVoteContainer>
+    );
+}
 
 const ActiveVoteContainer = styled.div`
     width: 80vw;
@@ -22,24 +37,11 @@ const VoteTitle = styled.h3`
     font-size: 16px;
     font-weight: 600;
 `;
-
 const VoteInfo = styled.p`
     font-size: 12px;
     color: #5f6b7a;
     margin: 0;
 `;
 
-function ActiveVoteDisplay({ voteData }: ActiveVoteDisplayProps) {
-    return (
-        <ActiveVoteContainer>
-            <VoteTitle>🗳️ "{voteData.title}" 투표가 진행중입니다!</VoteTitle>
-            <VoteInfo>
-                {voteData.allowMultipleSelections ? "복수 선택 가능" : "단일 선택"}
-                {voteData.isAnonymous && ", 익명 투표"}
-            </VoteInfo>
-            {/* 필요에 따라 더 많은 정보 (예: 참여 버튼)를 추가할 수 있습니다. */}
-        </ActiveVoteContainer>
-    );
-}
 
 export default ActiveVoteDisplay;
