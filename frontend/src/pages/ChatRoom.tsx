@@ -126,6 +126,52 @@ function ChatRoom({ onInitiateCreateVote, chatAutoInput, setChatAutoInput, activ
         ]);
     });
 
+    // 정답여부 알림
+    socket.on('quiz_ended', ({ answer, result }) => {
+      const myId = socket.id; // 현재 접속자의 socket.id
+      const me = result.find((r) => r.socketId === myId);// 정답자의 아이디에 있는지 비교
+
+      if (me) {
+        if (me.isCorrect) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              nickname: 'SYSTEM',
+              text: `🎉 정답입니다! 정답 : ${me.submitted}`,
+              timestamp: new Date().toLocaleTimeString('ko-KR', {
+                hour: '2-digit',
+                minute: '2-digit',
+              }),
+            },
+          ]);
+        } else {
+          setMessages((prev) => [
+            ...prev,
+            {
+              nickname: 'SYSTEM',
+              text: `❌ 오답입니다. 제출한 답: "${me.submitted}", 정답은 "${answer}"입니다.`,
+              timestamp: new Date().toLocaleTimeString('ko-KR', {
+                hour: '2-digit',
+                minute: '2-digit',
+              }),
+            },
+          ]);
+        }
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          {
+            nickname: 'SYSTEM',
+            text: `정답을 제출하지 않았습니다. 정답은 "${answer}"였습니다.`,
+            timestamp: new Date().toLocaleTimeString('ko-KR', {
+              hour: '2-digit',
+              minute: '2-digit',
+            }),
+          },
+        ]);
+      }
+    });
+
 
     return () => {
       socket.disconnect();
