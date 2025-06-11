@@ -2,12 +2,14 @@ import { useState } from "react";
 import ChatRoom from "./pages/ChatRoom";
 import { GlobalStyle } from "./styles/global.style";
 import VoteModal from "./pages/components/VoteModal";
+import type { VoteData } from "./pages/components/VoteModal"; // VoteData 타입 임포트
 
 function App() {
 
   // 투표 모달 상태관리
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
   const [voteMode, setVoteMode] = useState<'create' | 'owner' | 'participant'>('create');
+  const [activeVote, setActiveVote] = useState<VoteData | null>(null); // 현재 활성화된 투표 상태
 
   // 퀴즈 상태관리
   const [chatAutoInput, setChatAutoInput] = useState("");
@@ -17,6 +19,13 @@ function App() {
     setIsVoteModalOpen(true);
   };
 
+  // ChatRoom에서 establishedNickname을 함께 받아와야 함.
+  // 여기서는 예시로 VoteData에 ownerNickname이 이미 포함되어 있다고 가정.
+  const handleCreateVoteSuccess = (newVoteData: VoteData) => {
+    setActiveVote(newVoteData); // ownerNickname 포함된 데이터로 업데이트
+    setIsVoteModalOpen(false);
+  };
+
   return (
     <>
       <GlobalStyle />
@@ -24,6 +33,7 @@ function App() {
         onInitiateCreateVote={handleInitiateCreateVote}
         chatAutoInput={chatAutoInput} // chatAutoInput 상태 값 전달
         setChatAutoInput={setChatAutoInput}
+        activeVote={activeVote}
       />
       {/* 투표 (생성/수정/투표자) 테스트 버튼
       <div style={{display:'flex', gap: 8, marginBottom: 16}}>
@@ -37,6 +47,8 @@ function App() {
         isOpen={isVoteModalOpen}
         onClose={() => setIsVoteModalOpen(false)}
         mode={voteMode}
+        initialVoteData={activeVote && (voteMode === 'owner' || voteMode === 'participant') ? activeVote : undefined}
+        onCreateVoteSuccess={handleCreateVoteSuccess}
       />
     </>
   )
