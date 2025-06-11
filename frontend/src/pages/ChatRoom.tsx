@@ -153,7 +153,7 @@ function ChatRoom({ onInitiateCreateVote, chatAutoInput, setChatAutoInput, activ
     // 정답여부 알림
     socket.on('quiz_ended', ({ answer, result }) => {
       const myId = socket.id; // 현재 접속자의 socket.id
-      const me = result.find((r) => r.socketId === myId);// 정답자의 아이디에 있는지 비교
+      const me = result.find((r: { socketId: string }) => r.socketId === myId);// 정답자의 아이디에 있는지 비교
 
       if (me) {
         if (me.isCorrect) {
