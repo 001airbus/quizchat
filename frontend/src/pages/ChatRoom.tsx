@@ -7,6 +7,8 @@ import MessageList from './components/MessageList';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import { io, Socket } from 'socket.io-client';
+import type { VoteData } from './components/VoteModal';
+import ActiveVoteDisplay from './components/ActiveVoteDisplay';
 
 export interface ChatMessage {
   id?: string; // socket.io 서버에서는 id 자동 생성되지 않을 수 있음
@@ -16,23 +18,31 @@ export interface ChatMessage {
 }
 
 type ChatRoomProps = {
-  onInitiateCreateVote: () => void;
+  onInitiateCreateVote: (currentEstablishedNickname?: string) => void;
   chatAutoInput: string;
   setChatAutoInput: React.Dispatch<React.SetStateAction<string>>;
+  activeVote: VoteData | null;
+  onOpenVoteForViewing: (voteData: VoteData, mode: 'owner' | 'participant', nickname?: string) => void;
+  lastVoteEvent: {
+    type: 'closed';
+    title: string;
+    winningOptions?: string[];
+    maxVotes?: number;
+    noVotes?: boolean;
+  } | null;
+  onVoteEventProcessed: () => void;
 };
 
-function ChatRoom({ onInitiateCreateVote, chatAutoInput, setChatAutoInput }: ChatRoomProps) {
+function ChatRoom({ onInitiateCreateVote, chatAutoInput, setChatAutoInput, activeVote, onOpenVoteForViewing, lastVoteEvent, onVoteEventProcessed}: ChatRoomProps) {
   const [isNicknameModalOpen, setIsNicknameModalOpen] = useState(true);
   const [nickname, setNickname] = useState('');
-  const [currentNickname, setCurrentNickname] = useState('');
+  const [establishedNickname, setEstablishedNickname] = useState(''); 
   const [nicknameError, setNicknameError] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    const socket = io(import.meta.env.VITE_SOCKET_URL, {
-      transports: ['websocket'],
-    });
+    const socket = io(import.meta.env.VITE_SOCKET_URL);
 
     socketRef.current = socket;
     
@@ -44,10 +54,6 @@ function ChatRoom({ onInitiateCreateVote, chatAutoInput, setChatAutoInput }: Cha
     socket.on('connect_error', (err) => {
         console.error('WebSocket 연결 실패:', err.message);
     });
-
-
-
-    
 
     // // 닉네임 등록 후 연결
     // if (nickname) {
@@ -88,7 +94,7 @@ function ChatRoom({ onInitiateCreateVote, chatAutoInput, setChatAutoInput }: Cha
         setNicknameError(payload.msg);
         setIsNicknameModalOpen(true);
         //socket.disconnect();
-        setNickname(currentNickname);
+        setNickname(establishedNickname);
       }
     });
 
@@ -121,15 +127,56 @@ function ChatRoom({ onInitiateCreateVote, chatAutoInput, setChatAutoInput }: Cha
     });
 
 
-
-
-
-
-
     return () => {
       socket.disconnect();
     };
   }, []);
+
+  useEffect(() => {
+    if (lastVoteEvent?.type === 'closed' && lastVoteEvent.title) {
+      let resultMessage = `투표 '${lastVoteEvent.title}'가 종료되었습니다.`;
+      if (lastVoteEvent.noVotes) {
+        resultMessage += " 아무도 투표하지 않았습니다.";
+      } else if (lastVoteEvent.winningOptions && lastVoteEvent.winningOptions.length > 0 && lastVoteEvent.maxVotes !== undefined) {
+        if (lastVoteEvent.winningOptions.length === 1) {
+          resultMessage += ` 가장 많은 표를 받은 항목은 "${lastVoteEvent.winningOptions[0]}" (${lastVoteEvent.maxVotes}표) 입니다.`;
+        } else {
+          resultMessage += ` 가장 많은 표를 받은 항목은 "${lastVoteEvent.winningOptions.join('", "')}" (각 ${lastVoteEvent.maxVotes}표) 입니다.`;
+        }
+      } else {
+        // 이 경우는 noVotes가 false인데 winningOptions나 maxVotes가 없는 경우, 예외 처리 또는 기본 메시지
+        resultMessage += " 투표 결과 집계 중 오류가 발생했거나, 투표 항목이 없었습니다.";
+      }
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          id: `system-vote-closed-${Date.now()}-${Math.random()}`,
+          nickname: 'SYSTEM',
+          text: resultMessage,
+          timestamp: new Date().toLocaleTimeString('ko-KR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                }),
+        },
+      ]);
+      onVoteEventProcessed(); // 이벤트 처리 완료 알림
+    }
+    // setMessages를 의존성 배열에 추가하면 무한 루프가 발생할 수 있으므로,
+    // 함수형 업데이트를 사용하거나 ESLint 경고를 비활성화할 수 있습니다.
+    // 여기서는 함수형 업데이트를 사용했으므로 setMessages는 필수는 아닙니다.
+  }, [lastVoteEvent, onVoteEventProcessed]);
+
+
+  const handleActiveVoteClick = () => {
+    if(activeVote) {
+      if(!establishedNickname){
+        console.warn("닉네임이 설정되지 않아 투표 모드를 결정할 수 없습니다. 참여자 모드로 시도합니다.");
+      }
+      const mode = establishedNickname === activeVote.ownerNickname ? 'owner' : 'participant';
+      onOpenVoteForViewing(activeVote, mode, establishedNickname);
+    
+    }
+  }
 
   const handleNicknameSubmit = () => {
     if (!nickname.trim()) {
@@ -140,7 +187,7 @@ function ChatRoom({ onInitiateCreateVote, chatAutoInput, setChatAutoInput }: Cha
       setNicknameError('닉네임은 2자 이상이어야 합니다.');
       return;
     }
-    if (nickname.trim() === currentNickname) {
+    if (nickname.trim() === establishedNickname) {
         setIsNicknameModalOpen(false);
         return;
     }
@@ -150,13 +197,13 @@ function ChatRoom({ onInitiateCreateVote, chatAutoInput, setChatAutoInput }: Cha
   
 
   if (socketRef.current?.connected) {
-    if (!currentNickname) {
+    if (!establishedNickname) {
         socketRef.current.emit('set_nickname', nickname.trim());
     } else {
         socketRef.current.emit('change_nickname', nickname.trim());
     }
 
-    setCurrentNickname(nickname.trim());
+    setEstablishedNickname(nickname.trim());
 } else {
     console.error('소켓 연결이 되지 않았습니다.')
   }
@@ -211,12 +258,18 @@ function ChatRoom({ onInitiateCreateVote, chatAutoInput, setChatAutoInput }: Cha
       </Modal>
       <S.ChatRoomStyle>
         <Header />
-        <MessageList messages={messages} currentNickname={currentNickname} />
+        {activeVote && (
+          <div onClick={handleActiveVoteClick} style={{ cursor: 'pointer', display: 'flex', justifyContent: 'center', width: '100%' }}>
+            <ActiveVoteDisplay voteData={activeVote} />
+          </div>
+        )}
+
+        <MessageList messages={messages} currentNickname={establishedNickname} />
         <MessageInput
-          onInitiateCreateVote={onInitiateCreateVote}
+          onInitiateCreateVote={() => onInitiateCreateVote(establishedNickname)} // establishedNickname 전달
           chatAutoInput={chatAutoInput}
           setChatAutoInput={setChatAutoInput}
-          currentNickname={currentNickname}
+          currentNickname={establishedNickname}
           onRequestNicknameChange={handleRequestNicknameChange}
           onSendMessage={handleSendMessage}
         />

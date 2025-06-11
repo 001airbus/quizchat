@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import Input from "../../components/Input";
 import Menu from "../../assets/menu.svg?react";
@@ -20,7 +20,7 @@ function MessageInput({ onInitiateCreateVote, chatAutoInput, setChatAutoInput, c
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [currentMessage, setCurrentMessage] = useState(chatAutoInput);
 
-    const toggleMenu = () => {
+    const toggleMenu = (e: React.MouseEvent) => {
         setIsMenuOpen(!isMenuOpen);
     };
 

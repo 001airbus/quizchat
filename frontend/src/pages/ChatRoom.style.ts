@@ -11,6 +11,7 @@ export const ChatRoomStyle = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
 
     // 태블릿 기준
     @media screen and (min-width: ${breakpoints.tablet}) {

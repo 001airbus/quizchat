@@ -35,12 +35,12 @@ function MessageList({ messages, currentNickname }: MessageListProps){
 }
 
 const MessageListStyle = styled.div`
-    flex-grow: 1;
+    flex: 1 1 0; /* flex-grow: 1, flex-shrink: 1, flex-basis: 0 */
     overflow-y: auto;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     width: 100%;
-    gap: 10px;
 `;
 
 const MessageItem = styled.div<{ $isMine: boolean }>`
