@@ -1,6 +1,14 @@
 import styled from "styled-components";
 import type { ChatMessage } from "../ChatRoom";
 import { useEffect, useRef } from "react";
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import 'dayjs/locale/ko';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.locale('ko');
 
 interface MessageListProps {
     messages: ChatMessage[];
@@ -24,9 +32,9 @@ function MessageList({ messages, currentNickname }: MessageListProps){
                     <Bubble $isMine={msg.nickname === currentNickname}>
                         <Text>{msg.text}</Text>
                     </Bubble>
-                    {/* <Timestamp $isMine={msg.nickname === currentNickname}>{new Date(msg.timestamp).toLocaleTimeString()}</Timestamp> */}
-                    <Timestamp $isMine={msg.nickname === currentNickname}>{msg.timestamp}</Timestamp>
-                    {/* <Timestamp $isMine={msg.nickname === currentNickname}>{dayjs.utc(msg.timestamp).tz('Asia/Seoul').format('HH:mm')}</Timestamp> */}
+                    <Timestamp $isMine={msg.nickname === currentNickname}>
+                        {dayjs.utc(msg.timestamp).tz('Asia/Seoul').format('A hh:mm')}
+                    </Timestamp>
                 </MessageItem>
             ))}
             <div ref={messagesEndRef} />
@@ -35,7 +43,7 @@ function MessageList({ messages, currentNickname }: MessageListProps){
 }
 
 const MessageListStyle = styled.div`
-    flex: 1 1 0; /* flex-grow: 1, flex-shrink: 1, flex-basis: 0 */
+    flex: 1 1 0;
     overflow-y: auto;
     min-height: 0;
     display: flex;

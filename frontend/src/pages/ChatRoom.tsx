@@ -7,8 +7,14 @@ import MessageList from './components/MessageList';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import { io, Socket } from 'socket.io-client';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 import type { VoteData } from './components/VoteModal';
 import ActiveVoteDisplay from './components/ActiveVoteDisplay';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export interface ChatMessage {
   id?: string; // socket.io 서버에서는 id 자동 생성되지 않을 수 있음
@@ -62,13 +68,39 @@ function ChatRoom({ onInitiateCreateVote, chatAutoInput, setChatAutoInput, activ
 
     // 일반 채팅 메시지 수신
     socket.on('chat_message', (data: { nickname: string; message: string; time: string }) => {
-      //const formattedTime = dayjs(data.time).tz('Asia/Seoul').format('HH:mm'); //dayjs
+      let timestampUtc: string;
+      try{
+        const timeString = data.time;
+        const parts = timeString.split(' ');
+        if (parts.length !== 2) throw new Error("Invalid KST time string format");
+        
+        const amPm = parts[0];
+        const timeParts = parts[1].split(':');
+        if (timeParts.length !== 2) throw new Error("Invalid KST time string format (time part)");
+
+        let hours = parseInt(timeParts[0], 10);
+        const minutes = parseInt(timeParts[1], 10);
+
+        if (isNaN(hours) || isNaN(minutes)) throw new Error("Invalid number in KST time string");
+
+        if (amPm === '오후' && hours !== 12) hours += 12;
+        if (amPm === '오전' && hours === 12) hours = 0;
+
+        let kstTime = dayjs().tz("Asia/Seoul").hour(hours).minute(minutes).second(0).millisecond(0);
+        kstTime = kstTime.add(9, 'hour');
+
+        timestampUtc = kstTime.utc().toISOString();
+
+      }catch(error){
+        console.error("Error parsing KST time with dayjs:", error, "Original time:", data.time);
+        timestampUtc = dayjs().utc().toISOString();
+      }
       setMessages((prev) => [
         ...prev,
         {
           nickname: data.nickname,
           text: data.message,
-          timestamp: data.time,
+          timestamp: timestampUtc,
         },
       ]);
     });
@@ -80,10 +112,7 @@ function ChatRoom({ onInitiateCreateVote, chatAutoInput, setChatAutoInput, activ
         {
           nickname: 'SYSTEM',
           text: msg,
-          timestamp: new Date().toLocaleTimeString('ko-KR', {
-            hour: '2-digit',
-            minute: '2-digit',
-          }),
+          timestamp: dayjs().utc().toISOString(),
         },
       ]);
     });
@@ -104,24 +133,19 @@ function ChatRoom({ onInitiateCreateVote, chatAutoInput, setChatAutoInput, activ
             {
                 nickname: 'SYSTEM',
                 text: `퀴즈 오류: ${msg}`,
-                timestamp: new Date().toLocaleTimeString('ko-KR', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                }),
+                timestamp: dayjs().utc().toISOString(),
             },
         ]);
     });
 
     socket.on('quiz_info', ({ question, remainingTime, startedByName }) => {
+        const text = `${startedByName}님이 퀴즈를 출제했습니다.\n문제: ${question}\n제한 시간: ${remainingTime}초`;
         setMessages((prev) => [
             ...prev,
             {
                 nickname: 'SYSTEM',
-                text: `${startedByName}님이 퀴즈를 출제했습니다.\n문제: ${question}\n제한 시간: ${remainingTime}초`,
-                timestamp: new Date().toLocaleTimeString('ko-KR', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                }),
+                text: text,
+                timestamp: dayjs().utc().toISOString(),
             },
         ]);
     });
@@ -199,17 +223,13 @@ function ChatRoom({ onInitiateCreateVote, chatAutoInput, setChatAutoInput, activ
           id: `system-vote-closed-${Date.now()}-${Math.random()}`,
           nickname: 'SYSTEM',
           text: resultMessage,
-          timestamp: new Date().toLocaleTimeString('ko-KR', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                }),
+          timestamp: dayjs().utc().toISOString(),
+
         },
       ]);
       onVoteEventProcessed(); // 이벤트 처리 완료 알림
     }
-    // setMessages를 의존성 배열에 추가하면 무한 루프가 발생할 수 있으므로,
-    // 함수형 업데이트를 사용하거나 ESLint 경고를 비활성화할 수 있습니다.
-    // 여기서는 함수형 업데이트를 사용했으므로 setMessages는 필수는 아닙니다.
+
   }, [lastVoteEvent, onVoteEventProcessed]);
 
 
@@ -269,10 +289,8 @@ function ChatRoom({ onInitiateCreateVote, chatAutoInput, setChatAutoInput, activ
                 {
                 nickname: 'SYSTEM',
                 text: '정답을 제출했어요! 결과를 기다리는 중...',
-                timestamp: new Date().toLocaleTimeString('ko-KR', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                }),
+                timestamp: dayjs().utc().toISOString(),
+
             },
         ]);
     }
