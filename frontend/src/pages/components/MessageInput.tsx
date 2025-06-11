@@ -30,8 +30,8 @@ function MessageInput({ onInitiateCreateVote, chatAutoInput, setChatAutoInput, c
     };
 
     const handleQuizClick = () => {
-        setChatAutoInput("/quiz 문제: 정답: 제한시간: ");
-        setCurrentMessage("/quiz 문제: 정답: 제한시간: ");
+        setChatAutoInput("/quiz 질문: 정답: 제한시간: ");
+        setCurrentMessage("/quiz 질문: 정답: 제한시간: ");
         setIsMenuOpen(false);
     };
 

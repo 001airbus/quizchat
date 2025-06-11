@@ -14,11 +14,11 @@ export const ChatRoomStyle = styled.div`
 
     // 태블릿 기준
     @media screen and (min-width: ${breakpoints.tablet}) {
-        background-color: red;
+        background-color: white;
     }
 
     // 데스크탑 기준
     @media screen and (min-width: ${breakpoints.desktop}) {
-        background-color: yellow;
+        background-color: white;
     }
 `;
