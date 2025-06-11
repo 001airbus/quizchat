@@ -21,6 +21,7 @@ const HeaderStyle = styled.div`
         font-size: 20px;
         color: #5A8BD9;
         margin-top: 15px;
+        margin-bottom: 15px;
     }
 `;
 const Indicator = styled.div`
