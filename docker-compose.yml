@@ -1,0 +1,41 @@
+services:
+  backend: 
+    build: ./backend
+    ports:
+      - "5000:5000"
+    networks:
+      - mynetwork
+    env_file:
+      - ./backend/.env
+    environment:
+      REDIS_HOST: redis 
+      REDIS_PORT: 6379 
+    depends_on:
+      - redis
+    # extra_hosts:
+    #   - "host.docker.internal:host-gateway"
+
+  redis: 
+    image: redis:latest 
+    ports:
+       - "6379:6379"
+    networks:
+      - mynetwork
+
+  frontend:
+   build: ./frontend
+   ports:
+     - "5173:80"
+   networks:
+      - mynetwork
+   depends_on:
+     - backend 
+
+networks:
+  mynetwork:
+    driver: bridge
+
+# volumes: 추후 영구저장이 필요할 때 주석 해제
+#   redis_data:
+
+#     driver: local
