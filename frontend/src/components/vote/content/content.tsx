@@ -79,17 +79,18 @@ const Content = () => {
 	};
 
 	const onSaveClick = () => {
-		console.log("creator", isCreator)
 		const hasActive = (voteState?.isActive && !voteState?.isEnded) || (quizState?.isActive && !quizState?.isEnded);
 
-		// if (!isCreator && hasActive) {
-		// 	alert("진행 중인 투표 또는 퀴즈가 있습니다.");
+		// if (isCreator && isTimerActive) {
+		// 	alert("이게 맞나?");
 		// 	return;
 		// }
 
-		if (hasActive) {
-			alert("진행 중인 투표 또는 퀴즈가 있습니다.");
+		if (isCreator && isTimerActive) {
+			alert("크리에이터이며 타이머가 활성화.");
 			return;
+		} else if (hasActive) {
+			alert("수정되었습니다.");
 		}
 
 		const data = {
