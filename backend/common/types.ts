@@ -25,6 +25,7 @@ export interface VoteState {
     items: VoteItem[];   // 투표 항목들
     isActive: boolean;   // 투표 활성화 여부
     isMultiple: boolean; // 중복 투표 가능 여부
+    startedAt: number
 };
 
 // 퀴즈 관련

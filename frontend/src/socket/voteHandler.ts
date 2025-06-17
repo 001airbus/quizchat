@@ -20,7 +20,7 @@ export const useVoteHandler = () => {
         voteItems
     } = useVoteStore();
     const isCreator = isVoteCreator();
-    const { resetTimer } = useTimerStore();
+    const { resetTimer,startTimer } = useTimerStore();
     const getCurrentTime = () => {
         const now = new Date();
         return now.toTimeString().slice(0, 5);
@@ -28,7 +28,14 @@ export const useVoteHandler = () => {
 
     const updateFromServer=useVoteStore((state) => state.updateFromServer);
 //   const { sendSystemMessage } = useMessageHandler();
-
+    const handleTimerStart = (voteData: VoteState) => {
+        const remainingTime = 60 - Math.floor((Date.now() - voteData.startedAt) / 1000);
+        if (remainingTime > 0) {
+            console.log(`[타이머 시작] ${remainingTime}초 남음`);
+            useVoteStore.getState().setStartedAt(voteData.startedAt);
+            startTimer(remainingTime);
+        }
+    };
     
     useEffect(() => {
         if (isVoteSocketInitialized) return;
@@ -36,12 +43,26 @@ export const useVoteHandler = () => {
         socket.emit("GET_CURRENT_VOTE");
 
         socket.on("START_VOTE", (data: VoteState) => {
+            console.log("[소켓] START_VOTE 수신:", data);
             setVoteState(data);
             updateFromServer(data);
             useVoteStore.getState().setVoteState(data);
             useVoteStore.getState().updateFromServer(data);
-        });
+            const remainingTime = 60 - Math.floor((Date.now() - data.startedAt) / 1000);
 
+            if (data.isActive && data.startedAt) {
+                handleTimerStart(data);
+            }
+        });
+        socket.on("CURRENT_VOTE", (data: VoteState) => {
+            setVoteState(data);
+            updateFromServer(data);
+            console.log("[소켓] CURRENT_VOTE 수신:", data);
+            const remainingTime = 60 - Math.floor((Date.now() - data.startedAt) / 1000);
+            if (data.isActive && data.startedAt) {
+                handleTimerStart(data);
+            }
+        });
         // 투표 업데이트 이벤트
         socket.on('UPDATE_VOTE', (data: VoteState) => {
             setVoteState(data);

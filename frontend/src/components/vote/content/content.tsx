@@ -79,23 +79,21 @@ const Content = () => {
 	};
 
 	const onSaveClick = () => {
-		console.log("creator", isCreator)
 		const hasActive = (voteState?.isActive && !voteState?.isEnded) || (quizState?.isActive && !quizState?.isEnded);
 
 		// if (!isCreator && hasActive) {
 		// 	alert("진행 중인 투표 또는 퀴즈가 있습니다.");
 		// 	return;
 		// }
-
 		if (hasActive) {
 			alert("진행 중인 투표 또는 퀴즈가 있습니다.");
 			return;
 		}
-
 		const data = {
 			title,
 			items: voteItems,
 			isMultiple: isDuplicated,
+			startedAt: new Date(),
 		};
 		save(data);
 	};

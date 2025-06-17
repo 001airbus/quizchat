@@ -45,7 +45,7 @@ export const useVote = () => {
 			setIsTimerActive(true);
 			startVote(data);
 
-		startTimer()
+
 		} catch (error) {
 			console.error('투표 시작 오류:', error);
 			setIsSave(false);
