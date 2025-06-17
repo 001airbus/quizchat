@@ -2,8 +2,8 @@ import { Server, Socket } from 'socket.io';
 import type { StartVotePayload, VoteState } from '../common/types';
 import { getRedisValue, setRedisValue, delRedisValue } from '../utils/redis';
 
-let currentVote: VoteState | null = null; 
-let userVotes = new Map<number, Set<number>>(); 
+let currentVote: VoteState | null = null;
+let userVotes = new Map<number, Set<number>>();
 
 async function loadCurrentVoteFromRedis(): Promise<VoteState | null> {
     const voteStateRaw = await getRedisValue('voteState');
