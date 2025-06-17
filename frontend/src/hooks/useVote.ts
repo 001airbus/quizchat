@@ -44,8 +44,6 @@ export const useVote = () => {
 			closeModal("vote");
 			setIsTimerActive(true);
 			startVote(data);
-
-
 		} catch (error) {
 			console.error('투표 시작 오류:', error);
 			setIsSave(false);
@@ -75,7 +73,6 @@ export const useVote = () => {
 			});
 		} else {
 			const updated = [id];
-
 			setSelectedVoteId(() => {
 				return updated;
 			});

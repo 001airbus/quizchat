@@ -1,7 +1,46 @@
+# OS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# node_modules
 node_modules/
+
+# Build output
+dist/
+dist-ssr/
+build/
+
+# TypeScript
+*.tsbuildinfo
+
+# Local config files
+*.local
+
+# Environment files
 backend/.env
 frontend/.env
-package-lock.json
-
-build/
 dist/frontend/.env
+
+# Editor swap files
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# JS files compiled from TS
+src/**/*.js
+src/**/*.js.map

@@ -15,7 +15,7 @@ import {useVoteHandler} from "@/socket/voteHandler";
 import { useQuizStore } from "@/store/useQuizStore";
 
 const Content = () => {
-	const { save, edit, vote } = useVote(); // vote 함수 다시 추가 (서버 전송용)
+	const { save, edit, vote } = useVote();
 	const { closeModal } = useModalStore();
 	const { userId } = useUserStore();
 
@@ -81,10 +81,6 @@ const Content = () => {
 	const onSaveClick = () => {
 		const hasActive = (voteState?.isActive && !voteState?.isEnded) || (quizState?.isActive && !quizState?.isEnded);
 
-		// if (!isCreator && hasActive) {
-		// 	alert("진행 중인 투표 또는 퀴즈가 있습니다.");
-		// 	return;
-		// }
 		if (hasActive) {
 			alert("진행 중인 투표 또는 퀴즈가 있습니다.");
 			return;
