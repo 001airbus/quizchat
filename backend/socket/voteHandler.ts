@@ -52,7 +52,8 @@ export function handleVote(io: Server, socket: Socket) {
                 count: 0
             })),
             isActive: true,
-            isMultiple
+            isMultiple,
+            startedAt: Date.now(),
         };
 
         userVotes.clear();

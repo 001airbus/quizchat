@@ -11,6 +11,8 @@ interface VoteStore {
 	selectedVoteId: number[];
 	isTimerActive: boolean;
 	isVoteEnded: boolean;
+	startedAt: number | null;
+	setStartedAt: (time: number) => void;
 	voteCreatorId: number | null;
 	currentUserId: number | null;
 	setVoteState: (newState: VoteState) => void
@@ -46,6 +48,7 @@ export const useVoteStore = create<VoteStore>((set, get) => ({
 		{ itemId: Date.now(), text: "", count: 0 },
 		{ itemId: Date.now() + 1, text: "", count: 0 },
 	],
+	startedAt: null,
 	isSave: false,
 	isDuplicated: false,
 	selectedVoteId: [],
@@ -119,6 +122,7 @@ export const useVoteStore = create<VoteStore>((set, get) => ({
 			isTimerActive: false,
 			isVoteEnded: false,
 			voteCreatorId: null,
+			startedAt: null,
 		});
 	},
 	updateFromServer: (data) => {
@@ -129,8 +133,8 @@ export const useVoteStore = create<VoteStore>((set, get) => ({
 			isSave: data.isActive,
 			isTimerActive: data.isActive && !data.isEnded,
 			isVoteEnded: data.isEnded,
-			voteCreatorId: data.userId || null
-
+			voteCreatorId: data.userId || null,
+			startedAt: data.timeLeft ? Date.now() - data.timeLeft : null,
 		});
 	},
 	isVote: (id) => {
@@ -144,5 +148,7 @@ export const useVoteStore = create<VoteStore>((set, get) => ({
 			setSelectedVoteId(() => [id]);
 		}
 	},
+
+	setStartedAt: (time: number) => set({ startedAt: time }),
 	setVoteCreatorId: (userId:number) => set({ voteCreatorId: userId}),
 }));

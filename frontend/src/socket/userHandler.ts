@@ -5,6 +5,7 @@ import type { VoteState, QuizState } from '@/common/types';
 import {useVoteStore} from "@/store/useVoteStore";
 import { useQuizStore } from "@/store/useQuizStore";
 import { initializeQuizSocket } from './quizHandler';
+import {useTimerStore} from "@/store/useTimerStore";
 let isSocketInitialized = false;
 
 export const useUserHandlers = () => {
@@ -13,7 +14,7 @@ export const useUserHandlers = () => {
     
     const { setQuizState } = useQuizStore.getState();
     const { setVoteState,updateFromServer} = useVoteStore();
-
+    const { startTimer } = useTimerStore();
     useEffect(() => {
         if (isSocketInitialized) return;
         isSocketInitialized = true;
@@ -62,7 +63,16 @@ export const useUserHandlers = () => {
         if(data.roomState.voteState){
             updateFromServer(data.roomState.voteState);
             setVoteState(data.roomState.voteState);
-        }
+
+            const voteState = data.roomState.voteState;
+            if (voteState.isActive && voteState.startedAt) {
+                const remainingTime = 60 - Math.floor((Date.now() - voteState.startedAt) / 1000);
+                if (remainingTime > 0) {
+                    console.log(`[joinRoom] 타이머 시작: ${remainingTime}초 남음`);
+                    useVoteStore.getState().setStartedAt(voteState.startedAt);
+                    startTimer(remainingTime);
+                }
+            }}
         useVoteStore.getState().setCurrentUserId(data.userId);
         initializeQuizSocket()
     };

@@ -26,6 +26,7 @@ export interface VoteState {
     isActive: boolean;   // 투표 활성화 여부
     isMultiple: boolean; // 중복 투표 가능 여부
     isEnded: boolean; //투표 종료 여부
+    startedAt: number
 };
 
 
