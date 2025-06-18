@@ -5,7 +5,7 @@ import { useTimerStore } from "@/store/useTimerStore";
 let isTimerSocketInitialized = false;
 
 export const useTimerHandler = () => {
-	const { setTimerState, resetTimer } = useTimerStore();
+	const { 	setTimerState, resetTimer } = useTimerStore();
 
 	useEffect(() => {
 		if (isTimerSocketInitialized) return;
