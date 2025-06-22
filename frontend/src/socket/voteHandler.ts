@@ -1,8 +1,8 @@
-import { socket } from "./socketManager";
+import {socket} from "./socketManager";
 import {useEffect, useState} from "react";
-import type { VoteItem, VoteState } from "@/common/types";
-import { useVoteStore } from "@/store/useVoteStore";
-import { sendSystemMessage } from "./messageHandler";
+import type {VoteItem, VoteState} from "@/common/types";
+import {useVoteStore} from "@/store/useVoteStore";
+import {sendSystemMessage} from "./messageHandler";
 import {useTimerStore} from "@/store/useTimerStore";
 import {useChatStore} from "@/store/useChatStore";
 
@@ -48,7 +48,6 @@ export const useVoteHandler = () => {
             updateFromServer(data);
             useVoteStore.getState().setVoteState(data);
             useVoteStore.getState().updateFromServer(data);
-            const remainingTime = 60 - Math.floor((Date.now() - data.startedAt) / 1000);
 
             if (data.isActive && data.startedAt) {
                 handleTimerStart(data);
@@ -58,7 +57,6 @@ export const useVoteHandler = () => {
             setVoteState(data);
             updateFromServer(data);
             console.log("[소켓] CURRENT_VOTE 수신:", data);
-            const remainingTime = 60 - Math.floor((Date.now() - data.startedAt) / 1000);
             if (data.isActive && data.startedAt) {
                 handleTimerStart(data);
             }

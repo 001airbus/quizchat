@@ -1,6 +1,6 @@
-import { useModalStore } from "@/store/useModalStore";
-import { useVoteStore } from "@/store/useVoteStore";
-import { useVoteHandler } from "@/socket/voteHandler";
+import {useModalStore} from "@/store/useModalStore";
+import {useVoteStore} from "@/store/useVoteStore";
+import {useVoteHandler} from "@/socket/voteHandler";
 import {useUserStore} from "@/store/useUserStore";
 import {useTimerStore} from "@/store/useTimerStore";
 
@@ -54,7 +54,7 @@ export const useVote = () => {
 
 	const edit = async (id: number, data: any) => {
 		setIsSave(false);
-		setIsTimerActive(false);
+
 	};
 
 	const cancel = () => {

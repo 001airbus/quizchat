@@ -1,18 +1,18 @@
-import React, { ChangeEvent, useState, useEffect } from "react";
-import { IoIosCloseCircleOutline } from "react-icons/io";
+import React, {ChangeEvent, useEffect, useState} from "react";
+import {IoIosCloseCircleOutline} from "react-icons/io";
 import * as S from "./content.style";
 import Button from "@/components/button/button";
 import InputWithIcon from "@/components/vote/Input/input";
 import RadioBtn from "@/components/radioBtn/radioBtn";
 
-import { useVote } from "@/hooks/useVote";
-import { useVoteStore } from "@/store/useVoteStore";
-import { useModalStore } from "@/store/useModalStore";
+import {useVote} from "@/hooks/useVote";
+import {useVoteStore} from "@/store/useVoteStore";
+import {useModalStore} from "@/store/useModalStore";
 
 import {useUserStore} from "@/store/useUserStore";
 import {useTimerStore} from "@/store/useTimerStore";
 import {useVoteHandler} from "@/socket/voteHandler";
-import { useQuizStore } from "@/store/useQuizStore";
+import {useQuizStore} from "@/store/useQuizStore";
 
 const Content = () => {
 	const { save, edit, vote } = useVote();
@@ -77,21 +77,29 @@ const Content = () => {
 		if (isSave) return;
 		setTitle(e.target.value);
 	};
-
 	const onSaveClick = () => {
-		const hasActive = (voteState?.isActive && !voteState?.isEnded) || (quizState?.isActive && !quizState?.isEnded);
-
-		if (hasActive) {
-			alert("진행 중인 투표 또는 퀴즈가 있습니다.");
-			return;
-		}
+		// const hasActive = (voteState?.isActive && !voteState?.isEnded) || (quizState?.isActive && !quizState?.isEnded);
+		//
 		const data = {
 			title,
 			items: voteItems,
 			isMultiple: isDuplicated,
-			startedAt: new Date(),
+
 		};
-		save(data);
+
+		// if (hasActive) {
+		// 	if (confirm("현재 진행 중인 투표 또는 퀴즈가 있습니다. 새로 시작하시겠습니까?")) {
+		// 		socket.emit('END_VOTE');
+		//
+		// 		socket.once('END_VOTE', () => {
+		// 			save(data);
+		// 		});
+		// 	} else {
+		// 		return;
+		// 	}
+		// } else {
+			save(data);
+
 	};
 
 	const onEdit = () => {
