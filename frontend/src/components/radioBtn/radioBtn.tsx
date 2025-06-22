@@ -1,16 +1,16 @@
 import React from "react";
 import * as S from "./radioBtn.style";
-import { Label } from "@/constants/label";
-import { useVoteStore } from "@/store/useVoteStore";
+import {Label} from "@/constants/label";
+import {useVoteStore} from "@/store/useVoteStore";
 
 const RadioButton = () => {
-	const { isDuplicated, setIsDuplicated, isSave } = useVoteStore();
+	const { isDuplicated, setIsDuplicated, isSave,isEditMode } = useVoteStore();
 
 	const handleDuplicateChange = () => {
 		setIsDuplicated(!isDuplicated);
 	};
 
-	if (isSave) {
+	if (isSave && !isEditMode) {
 		return (
 			<S.RadioStatusText>
 				{isDuplicated ? "중복 선택 가능" : "중복 선택 불가능"}

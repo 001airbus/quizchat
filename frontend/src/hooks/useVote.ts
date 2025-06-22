@@ -16,10 +16,11 @@ export const useVote = () => {
 		selectedVoteId,
 		setCurrentUserId,
 		setVoteCreatorId,
+		setIsEditMode, // 편집 모드 setter 추가
 	} = useVoteStore();
 	const { userId } = useUserStore();
 
-	const { startVote, submitVote } = useVoteHandler();
+	const { startVote, submitVote, editVote } = useVoteHandler();
 	const { startTimer } = useTimerStore();
 
 	const save = async (data: any) => {
@@ -52,14 +53,37 @@ export const useVote = () => {
 		}
 	};
 
-	const edit = async (id: number, data: any) => {
-		setIsSave(false);
+	const edit = async (data: any) => {
+		if (!data.title.trim()) {
+			alert('투표 제목을 입력해주세요.');
+			return;
+		}
 
+		if (data.items.length < 2) {
+			alert('투표 항목은 최소 2개 이상이어야 합니다.');
+			return;
+		}
+
+		if (data.items.some((item: any) => !item.text.trim())) {
+			alert('모든 투표 항목을 입력해주세요.');
+			return;
+		}
+
+		try {
+
+			setIsEditMode(false); // 🔄 편집 모드 해제
+			closeModal("vote");
+			editVote(data); // 서버에 수정 요청
+		} catch (error) {
+			console.error('투표 수정 오류:', error);
+			alert('투표 수정 중 오류가 발생했습니다.');
+		}
 	};
 
 	const cancel = () => {
 		closeModal("vote");
 		resetVote();
+		setIsEditMode(false);
 	};
 
 	const vote = (id: number) => {
