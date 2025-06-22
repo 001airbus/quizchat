@@ -26,6 +26,10 @@ export const useVoteHandler = () => {
         return now.toTimeString().slice(0, 5);
     };
 
+    const editVote = (data: { title: string, items: VoteItem[], isMultiple: boolean }) => {
+        socket.emit('EDIT_VOTE', data);
+    };
+
     const updateFromServer=useVoteStore((state) => state.updateFromServer);
 //   const { sendSystemMessage } = useMessageHandler();
     const handleTimerStart = (voteData: VoteState) => {
@@ -61,6 +65,11 @@ export const useVoteHandler = () => {
                 handleTimerStart(data);
             }
         });
+        socket.on('EDIT_VOTE', (data: VoteState) => {
+            console.log("[소켓] EDIT_VOTE 수신:", data);
+            setVoteState(data);
+            updateFromServer(data);
+        });
         // 투표 업데이트 이벤트
         socket.on('UPDATE_VOTE', (data: VoteState) => {
             setVoteState(data);
@@ -77,6 +86,7 @@ export const useVoteHandler = () => {
             socket.off("START_VOTE");
             socket.off('UPDATE_VOTE');
             socket.off('END_VOTE');
+            socket.off('EDIT_VOTE');
             isVoteSocketInitialized = false;
         };
     }, []);
@@ -111,5 +121,5 @@ export const useVoteHandler = () => {
         socket.emit('END_VOTE');
     };
 
-    return { startVote, submitVote, endVote };
+    return { startVote, submitVote, endVote,editVote };
 };

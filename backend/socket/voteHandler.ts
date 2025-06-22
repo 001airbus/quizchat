@@ -1,6 +1,6 @@
-import { Server, Socket } from 'socket.io';
-import type { StartVotePayload, VoteState } from '../common/types';
-import { getRedisValue, setRedisValue, delRedisValue } from '../utils/redis';
+import {Server, Socket} from "socket.io";
+import type {StartVotePayload, VoteState} from "../common/types";
+import {delRedisValue, getRedisValue, setRedisValue} from "../utils/redis";
 
 let currentVote: VoteState | null = null;
 let userVotes = new Map<number, Set<number>>();
@@ -157,6 +157,45 @@ export function handleVote(io: Server, socket: Socket) {
 
             io.emit('END_VOTE', null);
         }
+    });
+    socket.on('EDIT_VOTE', async ({title, items, isMultiple}: StartVotePayload) => {
+        if (!currentVote) {
+            currentVote = await loadCurrentVoteFromRedis();
+        }
+
+        if (!currentVote || !currentVote.isActive) {
+            console.log('수정할 투표가 없거나 비활성화됨');
+            return;
+        }
+
+        // 투표 생성자만 수정 가능하도록 권한 체크
+        if (currentVote.userId !== socket.data.userId) {
+            console.log('투표 수정 권한 없음');
+            return;
+        }
+
+        // 투표 정보 업데이트 (기존 투표 수를 유지하면서)
+        const updatedItems = items.map(newItem => {
+            const existingItem = currentVote!.items.find(item => item.itemId === newItem.itemId);
+            return {
+                itemId: newItem.itemId,
+                text: newItem.text,
+                count: existingItem ? existingItem.count : 0 // 기존 투표 수 유지
+            };
+        });
+
+        currentVote = {
+            ...currentVote,
+            title,
+            items: updatedItems,
+            isMultiple
+        };
+
+        await saveCurrentVoteToRedis(currentVote);
+
+        // 모든 클라이언트에게 수정된 투표 정보 전송
+        io.emit('EDIT_VOTE', currentVote);
+        io.emit('UPDATE_VOTE', currentVote);
     });
 
     socket.on('GET_CURRENT_VOTE', async () => {

@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import {create} from "zustand";
 import type {VoteItem, VoteState} from "@/common/types";
 
 
@@ -29,7 +29,8 @@ interface VoteStore {
 	setCurrentUserId: (userId: number) => void;
 	isVoteCreator: () => boolean;
 	setVoteCreatorId: (userId: number) => void;
-
+	isEditMode: boolean;
+	setIsEditMode: (value: boolean) => void;
 	updateFromServer: (data: {
 		title: string;
 		items: Array<{ itemId: number; text: string; count: number }>;
@@ -48,6 +49,10 @@ export const useVoteStore = create<VoteStore>((set, get) => ({
 		{ itemId: Date.now(), text: "", count: 0 },
 		{ itemId: Date.now() + 1, text: "", count: 0 },
 	],
+	isEditMode: false,
+	setIsEditMode: (isEditMode)=>{
+		set({isEditMode:isEditMode});
+	},
 	startedAt: null,
 	isSave: false,
 	isDuplicated: false,
